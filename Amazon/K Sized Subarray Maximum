@@ -1,0 +1,53 @@
+Given an array arr[] of integers and an integer k, your task is to find the maximum value for each contiguous subarray of size k. The output should be an array of maximum values corresponding to each contiguous subarray.
+Examples:
+
+Input: arr[] = [1, 2, 3, 1, 4, 5, 2, 3, 6], k = 3
+Output: [3, 3, 4, 5, 5, 5, 6] 
+Explanation: 
+1st contiguous subarray = [1 2 3] max = 3
+2nd contiguous subarray = [2 3 1] max = 3
+3rd contiguous subarray = [3 1 4] max = 4
+4th contiguous subarray = [1 4 5] max = 5
+5th contiguous subarray = [4 5 2] max = 5
+6th contiguous subarray = [5 2 3] max = 5
+7th contiguous subarray = [2 3 6] max = 6
+
+**************************************************************************************************JAVA**************************************************************************************************************************
+TC:- O(n)
+SC:- O(n)
+
+class Solution {
+    // Function to find maximum of each subarray of size k.
+    public ArrayList<Integer> max_of_subarrays(int nums[], int k) {
+        // Your code here 
+        
+        int n = nums.length;
+        Deque<Integer> deq = new ArrayDeque<>();
+        ArrayList<Integer> result = new ArrayList<>();
+        
+        for (int i = 0; i < n; i++) 
+        {
+            // Step-1: Remove indices that are out of the current window
+            while (!deq.isEmpty() && deq.peekFirst() <= i - k) 
+            {
+                deq.pollFirst();
+            }
+            
+            // Step-2: Remove indices of elements smaller than the current element
+            while (!deq.isEmpty() && nums[i] > nums[deq.peekLast()]) {
+                deq.pollLast();
+            }
+            
+            // Step-3: Add the current index to the deque
+            deq.offerLast(i);
+            
+            // Step-4: If the window is fully formed, add the maximum to the result
+            if (i >= k - 1) {
+                result.add(nums[deq.peekFirst()]);
+            }
+        }
+        
+        // Convert the result to an array and return it
+        return result;
+    }
+}
