@@ -1,0 +1,113 @@
+You are given the root of a binary tree with unique values, and an integer start. At minute 0, an infection starts from the node with value start.
+Each minute, a node becomes infected if:
+
+The node is currently uninfected.
+The node is adjacent to an infected node.
+Return the number of minutes needed for the entire tree to be infected.
+
+Example 1:
+
+Input: root = [1,5,3,null,4,10,6,9,2], start = 3
+Output: 4
+Explanation: The following nodes are infected during:
+- Minute 0: Node 3
+- Minute 1: Nodes 1, 10 and 6
+- Minute 2: Node 5
+- Minute 3: Node 4
+- Minute 4: Nodes 9 and 2
+It takes 4 minutes for the whole tree to be infected so we return 4.
+
+
+
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    public int amountOfTime(TreeNode root, int start)
+    {
+        HashMap<TreeNode, TreeNode> parentMap = new HashMap<>();
+        TreeNode targetNode = bfsToMapParents(root, parentMap, start);
+
+        return findMaxDistance(parentMap, targetNode);
+    }
+
+    private TreeNode bfsToMapParents(TreeNode root, HashMap<TreeNode, TreeNode> parentMap, int target) {
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+        TreeNode targetNode = null;
+
+        while (!queue.isEmpty()) {
+            TreeNode currentNode = queue.poll();
+
+            if (currentNode.val == target) targetNode = currentNode;
+
+            if (currentNode.left != null) {
+                parentMap.put(currentNode.left, currentNode);
+                queue.offer(currentNode.left);
+            }
+
+            if (currentNode.right != null) {
+                parentMap.put(currentNode.right, currentNode);
+                queue.offer(currentNode.right);
+            }
+        }
+
+        return targetNode;
+    }
+
+    private int findMaxDistance(HashMap<TreeNode, TreeNode> parentMap, TreeNode target) {
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.offer(target);
+        HashMap<TreeNode, Boolean> visited = new HashMap<>();
+        visited.put(target, true);
+
+        int maxTime = 0;
+
+        while (!queue.isEmpty()) {
+            int size = queue.size();
+            boolean burnt = false;
+
+            for (int i = 0; i < size; i++) {
+                TreeNode currentNode = queue.poll();
+
+                // Burn left child if it exists and is not visited
+                if (currentNode.left != null && !visited.containsKey(currentNode.left)) {
+                    burnt = true;
+                    visited.put(currentNode.left, true);
+                    queue.offer(currentNode.left);
+                }
+
+                // Burn right child if it exists and is not visited
+                if (currentNode.right != null && !visited.containsKey(currentNode.right)) {
+                    burnt = true;
+                    visited.put(currentNode.right, true);
+                    queue.offer(currentNode.right);
+                }
+
+                // Burn parent node if it exists and is not visited
+                if (parentMap.get(currentNode) != null && !visited.containsKey(parentMap.get(currentNode))) {
+                    burnt = true;
+                    visited.put(parentMap.get(currentNode), true);
+                    queue.offer(parentMap.get(currentNode));
+                }
+            }
+
+            if (burnt) maxTime++;
+        }
+
+        return maxTime;
+    }
+
+}
