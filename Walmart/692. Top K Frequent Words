@@ -1,0 +1,51 @@
+Given an array of strings words and an integer k, return the k most frequent strings.
+Return the answer sorted by the frequency from highest to lowest. Sort the words with the same frequency by their lexicographical order.
+
+Example 1:
+
+Input: words = ["i","love","leetcode","i","love","coding"], k = 2
+Output: ["i","love"]
+Explanation: "i" and "love" are the two most frequent words.
+Note that "i" comes before "love" due to a lower alphabetical order.
+Example 2:
+
+Input: words = ["the","day","is","sunny","the","the","the","sunny","is","is"], k = 4
+Output: ["the","is","sunny","day"]
+Explanation: "the", "is", "sunny" and "day" are the four most frequent words, with the number of occurrence being 4, 3, 2 and 1 respectively.
+
+
+class Solution {
+    public List<String> topKFrequent(String[] words, int k) {
+        // Count frequency of each word
+        Map<String, Integer> freqMap = new HashMap<>();
+        for (String word : words) {
+            freqMap.put(word, freqMap.getOrDefault(word, 0) + 1);
+        }
+
+        // Min-heap to store words by frequency and lexicographical order
+        PriorityQueue<String> pq = new PriorityQueue<>((w1, w2) -> {
+            int freq1 = freqMap.get(w1);
+            int freq2 = freqMap.get(w2);
+            if (freq1 == freq2) {
+                return w2.compareTo(w1); // Lexicographical order (reverse for min-heap)
+            }
+            return freq1 - freq2; // Frequency order
+        });
+
+        // Push into the heap and maintain size k
+        for (String word : freqMap.keySet()) {
+            pq.offer(word);
+            if (pq.size() > k) {
+                pq.poll();
+            }
+        }
+
+        // Build the result list in reverse order (highest frequency first)
+        List<String> result = new ArrayList<>();
+        while (!pq.isEmpty()) {
+            result.add(pq.poll());
+        }
+        Collections.reverse(result); // Reverse to get the correct order
+        return result;
+    }
+}
