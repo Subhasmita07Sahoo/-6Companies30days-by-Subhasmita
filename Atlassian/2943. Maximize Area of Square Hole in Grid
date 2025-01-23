@@ -21,17 +21,29 @@ To get the maximum square-shaped hole, we remove horizontal bar 2 and vertical b
 
 
 class Solution {
-    public int getMaxGap(int[] bars){
-        Arrays.sort(bars);
-        int count = 2, res = 2;
-        for(int i = 1; i < bars.length; ++i){
-            count = (bars[i-1] + 1 == bars[i])? count + 1: 2;
-            res = Math.max(res, count);
-        }
-        return res;
-    }
     public int maximizeSquareHoleArea(int n, int m, int[] hBars, int[] vBars) {
-        int gap = Math.min(getMaxGap(hBars), getMaxGap(vBars));
-        return gap * gap;
+        Arrays.sort(hBars);
+        Arrays.sort(vBars);
+        int mh = 1, mv = 1, c = 1;
+        
+        for (int i = 1; i < hBars.length; i++) {
+            if (hBars[i] == hBars[i - 1] + 1)
+                c++;
+            else
+                c = 1;
+            mh = Math.max(mh, c);
+        }
+        
+        c = 1;
+        for (int i = 1; i < vBars.length; i++) {
+            if (vBars[i] == vBars[i - 1] + 1)
+                c++;
+            else
+                c = 1;
+            mv = Math.max(mv, c);
+        }
+        
+        int x = Math.min(mh + 1, mv + 1);
+        return x * x;
     }
 }
